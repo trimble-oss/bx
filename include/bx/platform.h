@@ -470,7 +470,7 @@ static_assert(__cplusplus >= BX_LANGUAGE_CPP17, "\n\n"
 	"\t\n");
 
 // https://releases.llvm.org/
-static_assert(!BX_COMPILER_CLANG || BX_COMPILER_CLANG >= 110000, "\n\n"
+static_assert(!BX_COMPILER_CLANG || BX_COMPILER_CLANG >= 90000, "\n\n"
 	"\t** IMPORTANT! **\n\n"
 	"\tMinimum supported Clang version is 11.0 (October 12, 2020).\n"
 	"\t\n");
