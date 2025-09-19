@@ -1,12 +1,11 @@
 /*
- * Copyright 2010-2024 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2025 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx/blob/master/LICENSE
  */
 
 #ifndef BX_H_HEADER_GUARD
 #define BX_H_HEADER_GUARD
 
-#include <alloca.h> // alloca
 #include <stdarg.h> // va_list
 #include <stddef.h> // ptrdiff_t
 #include <stdint.h> // uint32_t
@@ -116,12 +115,13 @@ namespace bx
 	/// Assert handler function.
 	///
 	/// @param[in] _location Source code location where function is called.
+	/// @param[in] _skip Skip top N stack frames.
 	/// @param[in] _format Printf style format.
 	/// @param[in] _argList Arguments for `_format` specification.
 	///
 	/// @returns True if assert should stop code execution, otherwise returns false.
 	///
-	typedef bool (*AssertHandlerFn)(const Location& _location, const char* _format, va_list _argList);
+	typedef bool (*AssertHandlerFn)(const Location& _location, uint32_t _skip, const char* _format, va_list _argList);
 
 	/// Set assert handler function.
 	///
@@ -134,12 +134,13 @@ namespace bx
 	/// Assert function calls AssertHandlerFn.
 	///
 	/// @param[in] _location Source code location where function is called.
+	/// @param[in] _skip Skip top N stack frames.
 	/// @param[in] _format Printf style format.
 	/// @param[in] ... Arguments for `_format` specification.
 	///
 	/// @returns True if assert should stop code execution, otherwise returns false.
 	///
-	bool assertFunction(const Location& _location, const char* _format, ...);
+	bool assertFunction(const Location& _location, uint32_t _skip, const char* _format, ...);
 
 	/// Arithmetic type `Ty` limits.
 	template<typename Ty, bool SignT = isSigned<Ty>()>
@@ -216,6 +217,9 @@ namespace bx
 	template<typename Ty>
 	constexpr bool isPowerOf2(Ty _a);
 
+	/// Returns true if it's evaluated as constexpr.
+	constexpr bool isConstantEvaluated();
+
 	/// Returns a value of type `Ty` by reinterpreting the object representation of `FromT`.
 	template <typename Ty, typename FromT>
 	constexpr Ty bitCast(const FromT& _from);
@@ -223,7 +227,7 @@ namespace bx
 	/// Performs `static_cast` of value `_from`, and in debug build runtime verifies/asserts
 	/// that the value didn't change.
 	template<typename Ty, typename FromT>
-	constexpr Ty narrowCast(const FromT& _from, Location _location = Location::current() );
+	Ty narrowCast(const FromT& _from, Location _location = Location::current() );
 
 	/// Copy memory block.
 	///

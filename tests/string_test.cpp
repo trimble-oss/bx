@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2024 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2025 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx/blob/master/LICENSE
  */
 
@@ -9,6 +9,7 @@
 #include <bx/handlealloc.h>
 #include <bx/sort.h>
 #include <string>
+#include <tinystl/string.h>
 
 bx::AllocatorI* g_allocator;
 
@@ -207,7 +208,7 @@ TEST_CASE("strCmpV sort", "[string][sort]")
 		"test_100.txt",
 	};
 
-	BX_STATIC_ASSERT(BX_COUNTOF(test) == BX_COUNTOF(expected) );
+	static_assert(BX_COUNTOF(test) == BX_COUNTOF(expected) );
 
 	bx::quickSort(test, BX_COUNTOF(test), sizeof(const char*), strCmpV);
 
@@ -311,8 +312,10 @@ TEST_CASE("toString intXX_t/uintXX_t", "[string]")
 {
 	REQUIRE(testToStringS(0,          "0") );
 	REQUIRE(testToStringS(-256,       "-256") );
+	REQUIRE(testToStringS(INT32_MIN,  "-2147483648") );
 	REQUIRE(testToStringS(INT32_MAX,  "2147483647") );
 	REQUIRE(testToStringS(UINT32_MAX, "4294967295") );
+	REQUIRE(testToStringS(INT64_MIN,  "-9223372036854775808") );
 	REQUIRE(testToStringS(INT64_MAX,  "9223372036854775807") );
 	REQUIRE(testToStringS(UINT64_MAX, "18446744073709551615") );
 
@@ -634,4 +637,94 @@ TEST_CASE("0terminated", "[string]")
 	st = strTrimSuffix(t0, "89");
 	REQUIRE(2 == st.getLength() );
 	REQUIRE(st.is0Terminated() );
+}
+
+TEST(tinystl_string_constructor) {
+	using tinystl::string;
+	{
+		string s;
+		CHECK( s.size() == 0 );
+	}
+	{
+		string s("hello");
+		CHECK( s.size() == 5 );
+		CHECK( 0 == strcmp(s.c_str(), "hello") );
+	}
+	{
+		string s("hello world", 5);
+		CHECK( s.size() == 5 );
+		CHECK( 0 == strcmp(s.c_str(), "hello") );
+	}
+	{
+		const string other("hello");
+		string s = other;
+
+		CHECK( s.size() == 5 );
+		CHECK( 0 == strcmp(s.c_str(), "hello") );
+	}
+	{
+		string other("hello");
+		string s = std::move(other);
+
+		CHECK( s.size() == 5 );
+		CHECK( 0 == strcmp(s.c_str(), "hello") );
+		CHECK( other.size() == 0 );
+	}
+}
+
+TEST(tinystl_string_assign) {
+	using tinystl::string;
+	{
+		const string other("hello");
+		string s("new");
+		s = other;
+
+		CHECK( s.size() == 5 );
+		CHECK( 0 == strcmp(s.c_str(), "hello") );
+	}
+	{
+		string other("hello");
+		string s("new");
+		s = std::move(other);
+
+		CHECK( s.size() == 5 );
+		CHECK( 0 == strcmp(s.c_str(), "hello") );
+		CHECK( other.size() == 0 );
+	}
+
+	{
+		const string other("hello longer string here");
+		string s("short");
+		s = other;
+
+		CHECK( s.size() == 24 );
+		CHECK( 0 == strcmp(s.c_str(), "hello longer string here") );
+	}
+	{
+		string other("hello longer string here");
+		string s("short");
+		s = std::move(other);
+
+		CHECK( s.size() == 24 );
+		CHECK( 0 == strcmp(s.c_str(), "hello longer string here") );
+		CHECK( other.size() == 0 );
+	}
+
+	{
+		const string other("short");
+		string s("hello longer string here");
+		s = other;
+
+		CHECK( s.size() == 5 );
+		CHECK( 0 == strcmp(s.c_str(), "short") );
+	}
+	{
+		string other("short");
+		string s("hello longer string here");
+		s = std::move(other);
+
+		CHECK( s.size() == 5 );
+		CHECK( 0 == strcmp(s.c_str(), "short") );
+		CHECK( other.size() == 0 );
+	}
 }

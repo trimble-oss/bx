@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2024 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2025 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx/blob/master/LICENSE
  */
 
@@ -10,6 +10,7 @@
 
 BX_PRAGMA_DIAGNOSTIC_PUSH();
 BX_PRAGMA_DIAGNOSTIC_IGNORED_MSVC(4312); // warning C4312 : 'reinterpret_cast' : conversion from 'int' to 'const char *' of greater size
+//BX_PRAGMA_DIAGNOSTIC_IGNORED_CLANG("-Wnan-infinity-disabled");
 #include <catch/catch_amalgamated.hpp>
 BX_PRAGMA_DIAGNOSTIC_POP();
 
