@@ -8,7 +8,7 @@
 #include "bx.cpp"
 #include "commandline.cpp"
 #include "crtnone.cpp"
-#include "debug.cpp"
+ //#include "debug.cpp" // Avoid including debug.cpp directly to not cause multiple definition errors.
 #include "dtoa.cpp"
 #include "easing.cpp"
 #include "file.cpp"
